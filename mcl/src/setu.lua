@@ -45,10 +45,10 @@ thread(function()
             thread(function()
                 local num = 10 - #urllist
                 if num > 0 then
-                    local body, _ = Http.get("https://api.lolicon.app/setu/?r18=0&size=regular&num="..num)
-                    local bodyjson = Json.parseJson(tostring(body))
-                    for _, data in pairs(bodyjson.data) do
-                        table.insert(urllist, data.url)
+                    local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular&num="..num)
+                    local datajson = Json.parseJson(tostring(body)).data
+                    for _, data in pairs(datajson) do
+                        table.insert(urllist, data.urls.regular)
                     end
                 end
             end)
