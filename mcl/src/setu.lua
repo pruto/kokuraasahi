@@ -1,8 +1,12 @@
 local utils = require("src.libs.utils")
 
+local savedir = "./save/setu/"
 local urllist = {}
+local pathlist = {}
 local sendcd = {}
 local sendcrit = {}
+
+os.execute("mkdir -p "..savedir)
 
 Event.subscribe("FriendMessageEvent", function(event)
     -- handle_message(event.friend, "f"..tostring(event.friend.id), event.message)
@@ -17,12 +21,12 @@ function handle_message(source, srcid, message)
 
     if msgtable[1] == "setu" then
         if os.time() - (sendcd[srcid] or 0) > 20 then
-            if #urllist then
+            if #pathlist > 0 then
                 sendcd[srcid] = os.time()
                 sendcrit[srcid] = nil
-                local url = urllist[#urllist]
-                urllist[#urllist] = nil
-                source:sendMessage(ImageUrl(url, source))
+                local path = pathlist[#pathlist]
+                pathlist[#pathlist] = nil
+                source:sendMessage(ImageFile(path, source))
             end
         elseif not sendcrit[srcid] then
             sendcrit[srcid] = true
@@ -41,14 +45,28 @@ thread(function()
         end
 
         if delaysecs <= 0 then
-            delaysecs = 20
+            delaysecs = 10
             thread(function()
                 local num = 10 - #urllist
                 if num > 0 then
-                    local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular&num="..num)
+                    local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular")
                     local datajson = Json.parseJson(tostring(body)).data
                     for _, data in pairs(datajson) do
                         table.insert(urllist, data.urls.regular)
+                    end
+                end
+            end)
+            thread(function()
+                local ind = #pathlist + 1
+                if ind <= 10 and #urllist > 0 then
+                    local url = urllist[#urllist]
+                    urllist[#urllist] = nil
+                    local body, _ = Http.get(url)
+                    local fwrite = io.open(savedir..ind, "w")
+                    if fwrite then
+                        fwrite:write(body)
+                        fwrite:close()
+                        pathlist[ind] = savedir..ind
                     end
                 end
             end)
@@ -58,3 +76,4 @@ thread(function()
         sleep(1 * 1000)
     end
 end)
+

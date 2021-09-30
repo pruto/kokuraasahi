@@ -1,8 +1,9 @@
 local base64 = require("src.libs.base64")
 local utils = require("src.libs.utils")
 
+local savedir = "./save/tenhou/"
+local savefile = "save.json"
 local rootdata = {}
-local savepath = "./save/tenhou.json"
 local matchtimer = 0
 local matchlist = {}
 local strroomlist = {
@@ -14,8 +15,8 @@ local strroomlist = {
     ["185"] = "三凤南",
 }
 
-os.execute("mkdir -p ./save")
-local fread = io.open(savepath, "r")
+os.execute("mkdir -p "..savedir)
+local fread = io.open(savedir..savefile, "r")
 if fread then
     rootdata = Json.parseJson(fread:read("*a"))
     fread:close()
@@ -189,7 +190,7 @@ thread(function()
                                 if players[player] then
                                     legal = true
                                     reply = reply..player.." "
-                                    seat = i - i
+                                    seat = i - 1
                                 end
                             end
                             if legal then
@@ -213,7 +214,7 @@ thread(function()
 end)
 
 function save_rootdata()
-    local fwrite = io.open(savepath, "w")
+    local fwrite = io.open(savedir..savefile, "w")
     if fwrite then
         fwrite:write(Json.toJson(rootdata))
         fwrite:close()
