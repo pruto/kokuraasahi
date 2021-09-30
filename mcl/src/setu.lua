@@ -47,9 +47,9 @@ thread(function()
         if delaysecs <= 0 then
             delaysecs = 10
             thread(function()
-                local num = 10 - #urllist
+                local num = 5 - #urllist
                 if num > 0 then
-                    local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular")
+                    local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular&num="..num)
                     local datajson = Json.parseJson(tostring(body)).data
                     for _, data in pairs(datajson) do
                         table.insert(urllist, data.urls.regular)
@@ -58,7 +58,7 @@ thread(function()
             end)
             thread(function()
                 local ind = #pathlist + 1
-                if ind <= 10 and #urllist > 0 then
+                if ind <= 5 and #urllist > 0 then
                     local url = urllist[#urllist]
                     urllist[#urllist] = nil
                     local body, _ = Http.get(url)
