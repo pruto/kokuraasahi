@@ -173,31 +173,33 @@ thread(function()
                             table.insert(matchplayers, base64.decode(line[i]))
                         end
                         for srcid, srcdata in pairs(rootdata.srcdata) do
-                            local players = srcdata.players or {}
-                            local srctype = srcid:sub(1, 1)
-                            local srcnum = srcid:sub(2, -1)
-                            local source = nil
-                            if srctype == "f" then
-                                source = bot:getFriend(srcnum)
-                            elseif srctype == "g" then
-                                source = bot:getGroup(srcnum)
-                            end
-                            local legal = false
-                            local reply = ""
-                            local seat = 0
-        
-                            for i, player in ipairs(matchplayers) do
-                                if players[player] then
-                                    legal = true
-                                    reply = reply..player.." "
-                                    seat = i - 1
+                            if notifydata[srcid] then
+                                local players = srcdata.players or {}
+                                local srctype = srcid:sub(1, 1)
+                                local srcnum = srcid:sub(2, -1)
+                                local source = nil
+                                if srctype == "f" then
+                                    source = bot:getFriend(srcnum)
+                                elseif srctype == "g" then
+                                    source = bot:getGroup(srcnum)
+                                end
+                                local legal = false
+                                local reply = ""
+                                local seat = 0
+            
+                                for i, player in ipairs(matchplayers) do
+                                    if players[player] then
+                                        legal = true
+                                        reply = reply..player.." "
+                                        seat = i - 1
+                                    end
+                                end
+                                if legal then
+                                    local strroom = strroomlist[line[4]] or ""
+                                    reply = reply.."正在"..strroom.."对局 ".."https://tenhou.net/0/?wg="..line[1]..(seat ~= 0 and "&tw="..seat or "")
+                                    source:sendMessage(reply)
                                 end
                             end
-                            if legal then
-                                local strroom = strroomlist[line[4]] or ""
-                                reply = reply.."正在"..strroom.."对局 ".."https://tenhou.net/0/?wg="..line[1]..(seat ~= 0 and "&tw="..seat or "")
-                                source:sendMessage(reply)
-                            end 
                         end
                     end
                     existmatch[line[1]] = 30
