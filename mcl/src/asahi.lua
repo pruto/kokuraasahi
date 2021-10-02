@@ -18,11 +18,11 @@ function handle_message(source, message)
     if msgtable[1] == "asahi" then
         source:sendMessage([[
 asahi (朝日能帮上什么忙呢)
-thadd (关注天凤ID)
-thdel (取消关注天凤ID)
+thadd ID (关注天凤ID)
+thdel ID (取消关注天凤ID)
 thlist (查看关注的天凤ID列表)
 thmatch (查看天凤可以瞪的对局)
-thnotify 1/0 (开启/关闭对局通知)
+thnotify 1/0 (开/关 天凤对局通知)
 setu (没有这个功能)]])
     end
 end
