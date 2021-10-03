@@ -173,16 +173,17 @@ thread(function()
                             table.insert(matchplayers, base64.decode(line[i]))
                         end
                         for srcid, srcdata in pairs(rootdata.srcdata) do
-                            if notifydata[srcid] then
+                            local srctype = srcid:sub(1, 1)
+                            local srcnum = srcid:sub(2, -1)
+                            local source = nil
+                            if srctype == "f" then
+                                source = bot:getFriend(srcnum)
+                            elseif srctype == "g" then
+                                source = bot:getGroup(srcnum)
+                            end
+
+                            if source and notifydata[srcid] then
                                 local players = srcdata.players or {}
-                                local srctype = srcid:sub(1, 1)
-                                local srcnum = srcid:sub(2, -1)
-                                local source = nil
-                                if srctype == "f" then
-                                    source = bot:getFriend(srcnum)
-                                elseif srctype == "g" then
-                                    source = bot:getGroup(srcnum)
-                                end
                                 local legal = false
                                 local reply = ""
                                 local seat = 0
