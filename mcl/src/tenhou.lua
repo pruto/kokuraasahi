@@ -142,7 +142,7 @@ end
 
 thread(function()
     local bot = nil
-    local existmatch = {}
+    local allrecord = {}
     local inited = false
     local delaysecs = 0
 
@@ -157,37 +157,44 @@ thread(function()
                 delaysecs = 60
                 local notifydata = rootdata.notify
         
-                for k, v in pairs(existmatch) do 
-                    existmatch[k] = existmatch[k] - 1
-                    if existmatch[k] <= 0 then
-                        existmatch[k] = nil
+                for _, srcrecord in pairs(allrecord) do
+                    for rec, _ in pairs(srcrecord) do
+                        srcrecord[rec] = srcrecord[rec] - 1
+                        if srcrecord[rec] <= 0 then
+                            srcrecord[rec] = nil
+                        end
                     end
                 end
 
                 update_matchlist()
-                for _, rawstr in ipairs(matchlist) do
-                    local line = utils.split(rawstr, ",")
-                    if inited and not existmatch[line[1]] then
-                        local matchplayers = {}
-                        for i=5, #line, 3 do
-                            table.insert(matchplayers, base64.decode(line[i]))
-                        end
-                        for srcid, srcdata in pairs(rootdata.srcdata) do
-                            local srctype = srcid:sub(1, 1)
-                            local srcnum = srcid:sub(2, -1)
-                            local source = nil
-                            if srctype == "f" then
-                                source = bot:getFriend(srcnum)
-                            elseif srctype == "g" then
-                                source = bot:getGroup(srcnum)
-                            end
+                for srcid, srcdata in pairs(rootdata.srcdata) do
+                    local srctype = srcid:sub(1, 1)
+                    local srcnum = srcid:sub(2, -1)
+                    local source = nil
+                    if srctype == "f" then
+                        source = bot:getFriend(srcnum)
+                    elseif srctype == "g" then
+                        source = bot:getGroup(srcnum)
+                    end
 
-                            if source and notifydata[srcid] then
-                                local players = srcdata.players or {}
+                    if source and notifydata[srcid] then
+                        allrecord[srcid] = allrecord[srcid] or {}
+                        local srcrecord = allrecord[srcid]
+                        local players = srcdata.players or {}
+
+                        for _, rawstr in ipairs(matchlist) do
+                            local line = utils.split(rawstr, ",")
+
+                            if inited and not srcrecord[line[1]] then
                                 local legal = false
                                 local reply = ""
                                 local seat = 0
-            
+                                local matchplayers = {}
+
+                                for i=5, #line, 3 do
+                                    table.insert(matchplayers, base64.decode(line[i]))
+                                end
+
                                 for i, player in ipairs(matchplayers) do
                                     if players[player] then
                                         legal = true
@@ -201,9 +208,10 @@ thread(function()
                                     source:sendMessage(reply)
                                 end
                             end
+
+                            srcrecord[line[1]] = 30
                         end
                     end
-                    existmatch[line[1]] = 30
                 end
                 
                 delaysecs = 16
