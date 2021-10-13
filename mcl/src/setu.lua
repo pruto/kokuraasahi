@@ -50,9 +50,17 @@ thread(function()
                 local num = 5 - #urllist
                 if num > 0 then
                     local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular&num="..num)
-                    local datajson = Json.parseJson(tostring(body)).data
-                    for _, data in pairs(datajson) do
-                        table.insert(urllist, data.urls.regular)
+                    local datalist = Json.parseJson(tostring(body)).data
+                    for _, datarec in pairs(datalist) do
+                        local legal = true
+                        for _, tag in pairs(datarec.tags) do
+                            if tag == "R-18" then
+                                legal = false
+                            end
+                        end
+                        if legal then
+                            table.insert(urllist, datarec.urls.regular)
+                        end
                     end
                 end
             end)
