@@ -35,7 +35,7 @@ function handle_message(source, message)
             local strmode = args.strmode
 
             local body, _ = Http.get(url)
-            local plrlist = Json.parseJson(tostring(body):gsub(".*(%[.*%]).*", [[{"list":%1}]])).list
+            local plrlist = Json.parseJson([[{"list":]]..tostring(body)..[[}]]).list
             for _, plr in pairs(plrlist) do
             	if plr.nickname == msgtable[2] then
             		empty = false
