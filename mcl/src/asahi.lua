@@ -23,6 +23,7 @@ thdel ID (取消关注天凤ID)
 thlist (查看关注的天凤ID列表)
 thmatch (查看天凤可以瞪的对局)
 thnotify 1/0 (开/关 天凤对局通知)
+mspt (查询雀魂玩家pt)
 setu (没有这个功能)]])
     end
 end
