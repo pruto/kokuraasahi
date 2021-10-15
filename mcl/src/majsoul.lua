@@ -41,8 +41,14 @@ function handle_message(source, message)
             		empty = false
 
             		local rank = 3*(math.floor(plr.level.id/100)%100 - 1) + plr.level.id%100
-                    rank = rank >18 and (rank - 3) or rank
-            		local pt = plr.level.score + plr.level.delta
+                    local pt = plr.level.score + plr.level.delta
+
+                    if rank > 18 then
+                        rank = rank - 3
+                    elseif rank > 15 then
+                        pt = math.ceil((pt + 2000) / 100) * 10
+                    end
+            		
                     if pt < 0 then
                         if rank <= 4 then
                             pt = 0
