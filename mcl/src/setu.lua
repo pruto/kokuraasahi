@@ -21,12 +21,14 @@ function handle_message(source, srcid, message)
 
     if msgtable[1] == "setu" then
         if os.time() - (sendcd[srcid] or 0) > 20 then
+            sendcd[srcid] = os.time()
             if #pathlist > 0 then
-                sendcd[srcid] = os.time()
                 sendcrit[srcid] = nil
                 local path = pathlist[#pathlist]
                 pathlist[#pathlist] = nil
                 source:sendMessage(ImageFile(path, source))
+            else
+                source:sendMessage("呜呜已经没有了")
             end
         elseif not sendcrit[srcid] then
             sendcrit[srcid] = true
@@ -38,6 +40,7 @@ end
 thread(function()
     local bot = nil
     local delaysecs = 0
+    local cachecount = 30
 
     while true do
         for k, v in pairs(Bots) do
@@ -45,9 +48,10 @@ thread(function()
         end
 
         if delaysecs <= 0 then
-            delaysecs = 10
+            delaysecs = 12
             thread(function()
-                local num = 5 - #urllist
+                local num = cachecount - #urllist
+                num = num > 10 and 10 or num
                 if num > 0 then
                     local body, _ = Http.get("https://api.lolicon.app/setu/v2?r18=0&size=regular&num="..num)
                     local datalist = Json.parseJson(tostring(body)).data
@@ -66,7 +70,7 @@ thread(function()
             end)
             thread(function()
                 local ind = #pathlist + 1
-                if ind <= 5 and #urllist > 0 then
+                if ind <= cachecount and #urllist > 0 then
                     local url = urllist[#urllist]
                     urllist[#urllist] = nil
                     local body, _ = Http.get(url)
